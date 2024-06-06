@@ -11,9 +11,16 @@ def reverse_list(l:list):
     Input l is a list which can contain any type of data.
 
     """
+    
+    left, right =0, len(l)-1
+    while left < right:
+        l[left], l[right] = l[right], l[left]
+        left+=1
+        right-=1
+    #It doesn't make sense to return a sorted list after we reverse it!
+    return l
 
-    pass
-
+assert reverse_list([1,23,4]) == [4,23,1]
  
 
 def solve_sudoku(matrix):
