@@ -1,24 +1,33 @@
+from fastapi import FastAPI
+from fastapi import WebSocket
+
 app = FastAPI()
 
 class ConnectionManager:
 
     def __init__(self):
-        pass
+        self.active_connections = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        pass
+        self.active_connections.append(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        pass
+        self.active_connections.remove(websocket)
 
     async def broadcast(self, message: str):
         for connection in self.active_connections:
-            pass
+            await connection.send_text(message)
 
 manager = ConnectionManager()
 
 @app.websocket("/ws/{username}")
 async def websocket_endpoint(websocket: WebSocket, username: str):
-
-    pass
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            broadcast_message = f"{username}: {data}"
+            await manager.broadcast(broadcast_message)
+    finally:
+        manager.disconnect(websocket)
