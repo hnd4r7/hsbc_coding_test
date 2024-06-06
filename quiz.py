@@ -11,7 +11,7 @@ def reverse_list(l:list):
     Input l is a list which can contain any type of data.
 
     """
-    
+
     left, right =0, len(l)-1
     while left < right:
         l[left], l[right] = l[right], l[left]
@@ -38,5 +38,40 @@ def solve_sudoku(matrix):
     The input matrix is a 9x9 matrix. You need to write a program to solve it.
 
     """
+    matrix_row = len(matrix)
+    matrix_col = len(matrix[0])
 
-    pass
+    def isValid(row, col, val, m):
+        """
+        Helper function to check if a given value is valid at a specific position.
+        """
+        for i in range(9):
+            if m[row][i] == val or m[i][col] == val:
+                return False
+        start_row = row // 3 * 3
+        start_col = col // 3 * 3
+        for i in range(start_row, start_row + 3):
+            for j in range(start_col, start_col + 3):
+                if m[i][j] == val:
+                    return False
+        
+        return True
+
+    def dfs(m):
+        """
+        Depth-first search function to solve the Sudoku.
+        """
+        for i in range(matrix_row):
+            for j in range(matrix_col):
+                if m[i][j] != '.':
+                    continue
+                for k in range(1, 10):
+                    if isValid(i, j, str(k), m):
+                        m[i][j] = str(k)
+                        if dfs(m):
+                            return True
+                        m[i][j] = '.'
+                return False
+        return True
+
+    dfs(matrix)
