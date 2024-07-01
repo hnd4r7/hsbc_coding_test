@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from fastapi import WebSocket
+from fastapi import FastAPI, WebSocket
+from starlette.websockets import WebSocketDisconnect
 
 app = FastAPI()
 
@@ -29,5 +29,9 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
             data = await websocket.receive_text()
             broadcast_message = f"{username}: {data}"
             await manager.broadcast(broadcast_message)
+    except WebSocketDisconnect as e:
+        print(f"Websocket connection disconnected for {username}: {e}")
+    except Exception as e:
+        print(f"Error in websocket communication for {username}: {e}")
     finally:
         manager.disconnect(websocket)
